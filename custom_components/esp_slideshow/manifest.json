@@ -1,0 +1,14 @@
+{
+  "domain": "esp_slideshow",
+  "name": "ESP Slideshow",
+  "codeowners": [],
+  "config_flow": true,
+  "iot_class": "local_push",
+  "version": "1.0.0",
+  "zeroconf": [
+    {
+      "type": "_esp32-slideshow._tcp.local."
+    }
+  ],
+  "requirements": []
+}
