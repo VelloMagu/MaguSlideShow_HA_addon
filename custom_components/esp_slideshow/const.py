@@ -1,2 +1,2 @@
 DOMAIN = "esp_slideshow"
-PLATFORMS = ["light", "number"]
+PLATFORMS = ["light", "number", "button", "switch", "select"]

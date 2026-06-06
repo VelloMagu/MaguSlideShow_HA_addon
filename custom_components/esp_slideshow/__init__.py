@@ -47,12 +47,16 @@ class ESPSlideshowCoordinator:
         self._stop_event = asyncio.Event()
         self._listeners = []
         self._ws = None
+        self.timezones = ["UTC"]
 
     def start(self):
         """Start the WebSocket listener task."""
         self._stop_event.clear()
         self._ws_task = self.hass.async_create_background_task(
             self._ws_loop(), f"ESP Slideshow WS loop for {self.host}"
+        )
+        self.hass.async_create_background_task(
+            self.async_fetch_timezones(), f"ESP Slideshow fetch timezones for {self.host}"
         )
 
     async def async_stop(self):
@@ -148,3 +152,32 @@ class ESPSlideshowCoordinator:
             model="ESP32-S3 AMOLED Slideshow",
             sw_version=version,
         )
+
+    async def async_fetch_timezones(self) -> None:
+        """Fetch the timezone list from the device."""
+        tzs = await self.async_get_http("/api/tzlist")
+        if isinstance(tzs, list) and tzs:
+            self.timezones = sorted(list(tzs))
+
+    async def async_get_http(self, path: str):
+        """Send an HTTP GET request to the device."""
+        url = f"http://{self.host}{path}"
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=5) as response:
+                    if response.status == 200:
+                        return await response.json()
+        except Exception as err:
+            _LOGGER.error("HTTP GET to %s failed: %s", url, err)
+        return None
+
+    async def async_post_http(self, path: str, data: dict = None) -> bool:
+        """Send an HTTP POST request to the device."""
+        url = f"http://{self.host}{path}"
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, json=data, timeout=5) as response:
+                    return response.status == 200
+        except Exception as err:
+            _LOGGER.error("HTTP POST to %s failed: %s", url, err)
+            return False
