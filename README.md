@@ -2,7 +2,7 @@
 
 This integration allows you to control settings (like display power and brightness) and monitor your **ESP32 AMOLED Slideshow** screen directly from Home Assistant.
 
-[![Open your Home Assistant instance and open a repository window.](https://my.home-assistant.io/badgelink.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=VelloMagu&repository=MaguSlideShow_HA_addon&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=VelloMagu&repository=MaguSlideShow_HA_addon&category=integration)
 
 ---
 
