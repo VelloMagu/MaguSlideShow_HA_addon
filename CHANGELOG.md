@@ -2,6 +2,11 @@
 
 All notable changes to the Home Assistant integration (ESP Slideshow Addon) are documented here.
 
+## [1.3.3] - 2026-06-07
+
+### Changed
+- **Version Alignment**: Bump version to align with firmware 1.3.2 release.
+
 ## [1.3.2] - 2026-06-07
 
 ### Added
