@@ -2,6 +2,11 @@
 
 All notable changes to the Home Assistant integration (ESP Slideshow Addon) are documented here.
 
+## [1.3.4] - 2026-06-07
+
+### Fixed
+- **Initial Device Version**: Fetch `/api/info` synchronously on startup to ensure correct firmware version and MAC address are registered in Home Assistant immediately, resolving the old default version ("v0.25") issue.
+
 ## [1.3.3] - 2026-06-07
 
 ### Changed

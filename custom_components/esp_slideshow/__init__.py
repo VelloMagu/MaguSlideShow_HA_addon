@@ -16,6 +16,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = ESPSlideshowCoordinator(hass, entry)
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
+    # Fetch initial device info/version synchronously on startup
+    await coordinator.async_initialize()
+
     # Start the background websocket listener
     coordinator.start()
 
@@ -48,6 +51,12 @@ class ESPSlideshowCoordinator:
         self._listeners = []
         self._ws = None
         self.timezones = ["UTC"]
+
+    async def async_initialize(self) -> None:
+        """Fetch initial device info."""
+        info = await self.async_get_http("/api/info")
+        if isinstance(info, dict):
+            self.data.update(info)
 
     def start(self):
         """Start the WebSocket listener task."""
