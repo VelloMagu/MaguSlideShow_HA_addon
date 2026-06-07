@@ -76,16 +76,30 @@ class ESPSlideshowUpdateEntity(UpdateEntity):
                     self._latest_version = tag.lstrip('v')
                     self._release_notes = release_data.get("body", "")
                     
-                    # Look for a binary asset (e.g. firmware.bin or anything ending with .bin)
+                    # Look for a binary asset matching the device's hardware type (boardId)
+                    board_id = self.coordinator.data.get("boardId", "waveshare_2_41")
                     self._download_url = None
                     assets = release_data.get("assets", [])
+                    
+                    # 1. Attempt: search for a .bin asset containing the board_id (case-insensitive)
                     for asset in assets:
                         name = asset.get("name", "")
-                        if name.endswith(".bin"):
+                        if name.lower().endswith(".bin") and board_id.lower() in name.lower():
                             self._download_url = asset.get("browser_download_url")
+                            _LOGGER.info("Found hardware-specific firmware binary for %s: %s", board_id, name)
                             break
+                            
+                    # 2. Fallback: if not found, grab the first generic/available .bin asset
                     if not self._download_url:
-                        _LOGGER.warning("No firmware binary (.bin) found in the latest GitHub release")
+                        for asset in assets:
+                            name = asset.get("name", "")
+                            if name.lower().endswith(".bin"):
+                                self._download_url = asset.get("browser_download_url")
+                                _LOGGER.info("Falling back to first available firmware binary: %s", name)
+                                break
+                                
+                    if not self._download_url:
+                        _LOGGER.warning("No firmware binary (.bin) matching board ID '%s' found in the latest GitHub release", board_id)
                 else:
                     _LOGGER.error("Failed to fetch latest release from GitHub: HTTP %s", response.status)
         except Exception as err:

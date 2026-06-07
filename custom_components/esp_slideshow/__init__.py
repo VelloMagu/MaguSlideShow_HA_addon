@@ -145,11 +145,25 @@ class ESPSlideshowCoordinator:
         """Return device info."""
         mac = self.data.get("mac", self.host)
         version = self.data.get("firmware", "v0.25")
+        
+        # Determine manufacturer and model dynamically based on hardware name if available
+        board_name = self.data.get("boardName", "Waveshare ESP32-S3-Touch-AMOLED-2.41")
+        manufacturer = "Waveshare"
+        model = board_name
+        
+        if " " in board_name:
+            parts = board_name.split(" ", 1)
+            first_word = parts[0]
+            if first_word.lower() in ("waveshare", "lilygo", "m5stack", "heltec", "espressif", "esp32"):
+                if first_word.lower() != "esp32":
+                    manufacturer = first_word
+                    model = parts[1]
+
         return DeviceInfo(
             identifiers={(DOMAIN, mac)},
             name=self.name,
-            manufacturer="Waveshare",
-            model="ESP32-S3 AMOLED Slideshow",
+            manufacturer=manufacturer,
+            model=model,
             sw_version=version,
         )
 
