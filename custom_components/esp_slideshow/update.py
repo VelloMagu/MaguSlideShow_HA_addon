@@ -14,7 +14,7 @@ from .__init__ import ESPSlideshowCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-GITHUB_RELEASE_URL = "https://api.github.com/repos/VelloMagu/VMSlideshowv2/releases/latest"
+GITHUB_RELEASE_URL = "https://api.github.com/repos/VelloMagu/VMSlideShowReleases/releases/latest"
 
 async def async_setup_entry(
     hass: HomeAssistant,
