@@ -1,4 +1,5 @@
 from homeassistant.components.select import SelectEntity
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -31,6 +32,7 @@ class ESPSlideshowClockFormatSelect(SelectEntity):
         self._attr_name = f"{coordinator.name} Clock Format"
         self._attr_unique_id = f"{coordinator.host}_clock_format"
         self._attr_device_info = coordinator.device_info
+        self._attr_entity_category = EntityCategory.CONFIG
 
     @property
     def should_poll(self) -> bool:
@@ -65,6 +67,7 @@ class ESPSlideshowTimezoneSelect(SelectEntity):
         self._attr_name = f"{coordinator.name} Timezone"
         self._attr_unique_id = f"{coordinator.host}_timezone"
         self._attr_device_info = coordinator.device_info
+        self._attr_entity_category = EntityCategory.CONFIG
 
     @property
     def should_poll(self) -> bool:
@@ -108,6 +111,7 @@ class ESPSlideshowRotationSelect(SelectEntity):
         self._attr_name = f"{coordinator.name} Screen Rotation"
         self._attr_unique_id = f"{coordinator.host}_screen_rotation"
         self._attr_device_info = coordinator.device_info
+        self._attr_entity_category = EntityCategory.CONFIG
 
     @property
     def should_poll(self) -> bool:

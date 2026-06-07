@@ -1,4 +1,5 @@
 from homeassistant.components.number import NumberEntity, NumberMode
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -28,6 +29,7 @@ class ESPSlideshowDurationNumber(NumberEntity):
         self._attr_name = f"{coordinator.name} Slideshow Duration"
         self._attr_unique_id = f"{coordinator.host}_slideshow_duration"
         self._attr_device_info = coordinator.device_info
+        self._attr_entity_category = EntityCategory.CONFIG
         self._attr_native_min_value = 1
         self._attr_native_max_value = 300
         self._attr_native_step = 1
@@ -66,6 +68,7 @@ class ESPSlideshowClockIntervalNumber(NumberEntity):
         self._attr_name = f"{coordinator.name} Clock Interval"
         self._attr_unique_id = f"{coordinator.host}_clock_interval"
         self._attr_device_info = coordinator.device_info
+        self._attr_entity_category = EntityCategory.CONFIG
         self._attr_native_min_value = 1
         self._attr_native_max_value = 10
         self._attr_native_step = 1

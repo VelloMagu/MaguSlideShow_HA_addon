@@ -1,4 +1,5 @@
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -66,6 +67,7 @@ class ESPSlideshowClockSwitch(SwitchEntity):
         self._attr_name = f"{coordinator.name} Clock"
         self._attr_unique_id = f"{coordinator.host}_clock_enable"
         self._attr_device_info = coordinator.device_info
+        self._attr_entity_category = EntityCategory.CONFIG
 
     @property
     def should_poll(self) -> bool:
@@ -103,6 +105,7 @@ class ESPSlideshowRtcSwitch(SwitchEntity):
         self._attr_name = f"{coordinator.name} Use RTC"
         self._attr_unique_id = f"{coordinator.host}_rtc_enable"
         self._attr_device_info = coordinator.device_info
+        self._attr_entity_category = EntityCategory.CONFIG
 
     @property
     def should_poll(self) -> bool:
