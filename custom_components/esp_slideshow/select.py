@@ -103,7 +103,7 @@ class ESPSlideshowTimezoneSelect(SelectEntity):
 class ESPSlideshowRotationSelect(SelectEntity):
     """Representation of the Screen Rotation select."""
 
-    _attr_options = ["Portrait", "Landscape", "Portrait 180°", "Landscape 270°"]
+    _attr_options = ["Portrait", "Landscape", "Portrait 180°", "Landscape 270°", "Auto (IMU)"]
 
     def __init__(self, coordinator: ESPSlideshowCoordinator) -> None:
         """Initialize select."""
