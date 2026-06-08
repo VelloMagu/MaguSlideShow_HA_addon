@@ -1,11 +1,12 @@
 import logging
+from datetime import timedelta
 import aiohttp
 from homeassistant.components.update import (
     UpdateEntity,
     UpdateEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -13,6 +14,9 @@ from .const import DOMAIN
 from .__init__ import ESPSlideshowCoordinator
 
 _LOGGER = logging.getLogger(__name__)
+
+# Check GitHub for new releases every 4 hours.
+SCAN_INTERVAL = timedelta(hours=4)
 
 GITHUB_RELEASE_URL = "https://api.github.com/repos/VelloMagu/VMSlideShowReleases/releases/latest"
 
@@ -33,6 +37,7 @@ class ESPSlideshowUpdateEntity(UpdateEntity):
 
     _attr_has_entity_name = True
     _attr_title = "ESP Slideshow Firmware"
+    _attr_should_poll = True
 
     def __init__(self, coordinator: ESPSlideshowCoordinator) -> None:
         """Initialize the update entity."""
@@ -45,6 +50,19 @@ class ESPSlideshowUpdateEntity(UpdateEntity):
         self._latest_version = None
         self._release_notes = None
         self._download_url = None
+
+    async def async_added_to_hass(self) -> None:
+        """Register coordinator listener when added to HA."""
+        self.coordinator.register_listener(self._handle_coordinator_update)
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Unregister coordinator listener when removed from HA."""
+        self.coordinator.remove_listener(self._handle_coordinator_update)
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator (WebSocket)."""
+        self.async_write_ha_state()
 
     @property
     def installed_version(self) -> str | None:
@@ -68,8 +86,9 @@ class ESPSlideshowUpdateEntity(UpdateEntity):
     async def async_update(self) -> None:
         """Update entity state from GitHub releases."""
         session = async_get_clientsession(self.hass)
+        timeout = aiohttp.ClientTimeout(total=10)
         try:
-            async with session.get(GITHUB_RELEASE_URL, timeout=10) as response:
+            async with session.get(GITHUB_RELEASE_URL, timeout=timeout) as response:
                 if response.status == 200:
                     release_data = await response.json()
                     tag = release_data.get("tag_name", "")
@@ -100,6 +119,8 @@ class ESPSlideshowUpdateEntity(UpdateEntity):
                                 
                     if not self._download_url:
                         _LOGGER.warning("No firmware binary (.bin) matching board ID '%s' found in the latest GitHub release", board_id)
+                elif response.status == 403:
+                    _LOGGER.warning("GitHub API rate limit hit when checking for updates (HTTP 403)")
                 else:
                     _LOGGER.error("Failed to fetch latest release from GitHub: HTTP %s", response.status)
         except Exception as err:
@@ -116,7 +137,8 @@ class ESPSlideshowUpdateEntity(UpdateEntity):
         # 1. Download the firmware binary
         _LOGGER.info("Downloading ESP Slideshow firmware from %s", self._download_url)
         try:
-            async with session.get(self._download_url) as response:
+            timeout = aiohttp.ClientTimeout(total=60)
+            async with session.get(self._download_url, timeout=timeout) as response:
                 if response.status != 200:
                     _LOGGER.error("Failed to download firmware binary: HTTP %s", response.status)
                     return
@@ -135,7 +157,8 @@ class ESPSlideshowUpdateEntity(UpdateEntity):
 
         try:
             # We set a large timeout of 120 seconds since flashing can take time
-            async with session.post(url, data=data, timeout=120) as response:
+            upload_timeout = aiohttp.ClientTimeout(total=120)
+            async with session.post(url, data=data, timeout=upload_timeout) as response:
                 if response.status == 200:
                     _LOGGER.info("Successfully updated ESP Slideshow firmware. Device should be rebooting.")
                 else:
@@ -143,3 +166,4 @@ class ESPSlideshowUpdateEntity(UpdateEntity):
                     _LOGGER.error("Failed to upload firmware to ESP Slideshow: HTTP %s - %s", response.status, body)
         except Exception as err:
             _LOGGER.error("Error uploading firmware to ESP Slideshow: %s", err)
+

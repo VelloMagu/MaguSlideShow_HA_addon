@@ -2,6 +2,12 @@
 
 All notable changes to the Home Assistant integration (ESP Slideshow Addon) are documented here.
 
+## [1.3.5] - 2026-06-08
+
+### Fixed
+- **Update Reliability**: Fixed client timeouts in update checks, added periodic updates via `SCAN_INTERVAL`, and registered a listener for websocket-driven coordinator updates.
+- **GitHub Rate Limits**: Log a warning when update checks hit GitHub API rate limits (HTTP 403).
+
 ## [1.3.4] - 2026-06-07
 
 ### Fixed
