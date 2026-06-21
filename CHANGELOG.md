@@ -2,6 +2,11 @@
 
 All notable changes to the Home Assistant integration (ESP Slideshow Addon) are documented here.
 
+## [1.5.0] - 2026-06-21
+
+### Added
+- **Ambient light sensor**: Reports lux from VEML7700 or APDS-9960 when auto-brightness is enabled on firmware 1.5.0+.
+
 ## [1.3.5] - 2026-06-08
 
 ### Fixed
